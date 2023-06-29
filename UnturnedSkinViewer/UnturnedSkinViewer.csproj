@@ -4,6 +4,8 @@
     <TargetFramework>net461</TargetFramework>
 	<LangVersion>10</LangVersion>
 	  <Nullable>enable</Nullable>
+	  <DebugSymbols>false</DebugSymbols>
+	  <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
