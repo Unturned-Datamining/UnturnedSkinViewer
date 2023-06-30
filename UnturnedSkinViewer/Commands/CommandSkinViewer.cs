@@ -42,7 +42,8 @@ public class CommandSkinViewer : Command
             return;
         }
 
-        var econInfo = FindEconInfo(args[0]);
+        var econInfo = FindEconWithMythic(args[0],
+            args.Length >= 2 ? args[1] : null);
 
         if (econInfo == null)
         {
@@ -75,6 +76,38 @@ public class CommandSkinViewer : Command
         return int.TryParse(input, out var item)
             ? TempSteamworksEconomy.econInfo.Find(x => x.itemdefid == item)
             : null;
+    }
+
+    private MythicAsset? FindMythicAsset(string input)
+    {
+        if (Guid.TryParse(input, out var guid))
+        {
+            return Assets.find<MythicAsset>(guid);
+        }
+
+        return ushort.TryParse(input, out var id)
+            ? Assets.find(EAssetType.MYTHIC, id) as MythicAsset
+            : null;
+    }
+
+    private UnturnedEconInfo? FindEconWithMythic(string econInfoInput, string? mythicInput)
+    {
+        var econInfo = FindEconInfo(econInfoInput);
+        if (econInfo == null || econInfo.item_guid == Guid.Empty || mythicInput == null)
+        {
+            return econInfo;
+        }
+
+        var mythic = FindMythicAsset(mythicInput);
+        if (mythic == null)
+        {
+            return econInfo;
+        }
+
+        var newEconInfo = TempSteamworksEconomy.econInfo
+            .Find(x => x.item_guid == econInfo.item_guid && x.item_effect == mythic.id);
+
+        return newEconInfo ?? econInfo;
     }
 
     private void SetVisualClothing(PlayerClothing clothing, EItemType type, int item)
